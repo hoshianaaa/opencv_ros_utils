@@ -72,4 +72,21 @@ remap subscribe image topic name to `usb_cam/image_raw`
 rosrun opencv_ros_utils bgr8_to_mono8.py image_raw:=/usb_cam/image_raw
 ```
 
+# mono8_to_hist.py
+
+output histgram in ros topic
+
+## Subscribe Topics
+
+- /image_gray(sensor_msgs/Image)
+
+## Publish Topics
+
+- /histgram(sensor_msgs/Image)
+
+## example
+
+```
+rosrun opencv_ros_utils momo8_to_histgram.py image_raw:=/usb_cam/image_raw
+```
 
