@@ -90,3 +90,8 @@ output histgram in ros topic
 rosrun opencv_ros_utils momo8_to_histgram.py image_raw:=/usb_cam/image_raw
 ```
 
+show in 
+
+`rosrun rqt_iage_view rqt_image_view`
+
+![Screenshot from 2023-01-15 13-20-34](https://user-images.githubusercontent.com/40942409/212522748-fbbc74d0-a2c2-40fa-a03e-b502bc465001.png)
