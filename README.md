@@ -95,3 +95,22 @@ show histgram `use rqt_image_view`
 `rosrun rqt_iage_view rqt_image_view`
 
 ![Screenshot from 2023-01-15 13-20-34](https://user-images.githubusercontent.com/40942409/212522748-fbbc74d0-a2c2-40fa-a03e-b502bc465001.png)
+
+# img_pub_from_file.py
+
+image publisher from file
+
+## Subscribe Topics
+
+- None
+
+## Publish Topics
+
+- /usb_cam/image_raw(sensor_msgs/Image)
+
+## example
+
+```
+rosrun opencv_ros_utils img_pub_from_file.py image_samples/scratch.png
+```
+
