@@ -51,8 +51,8 @@ def process_image(msg):
     except Exception as err:
         print(err)
 
-rospy.init_node('img_proc')
+rospy.init_node('mono8_to_histgram')
 rospy.loginfo('img_proc node started')
-pub = rospy.Publisher('image_gray', Image, queue_size=10)
+pub = rospy.Publisher('hist_gram', Image, queue_size=10)
 rospy.Subscriber("image_raw", Image, process_image)
 rospy.spin()
