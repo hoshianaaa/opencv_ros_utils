@@ -7,7 +7,7 @@ import cv2
 def process_image(msg):
     try:
         bridge = CvBridge()
-        orig = bridge.imgmsg_to_cv2(msg, "bgr8")
+        orig = bridge.imgmsg_to_cv2(msg, "mono8")
 #        img = cv2.cvtColor(orig, cv2.COLOR_BGR2GRAY)
         cv2.imshow('image', orig)
         cv2.waitKey(1)
