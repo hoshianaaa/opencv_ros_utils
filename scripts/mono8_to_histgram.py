@@ -18,7 +18,7 @@ def img_to_hist(img):
 # ヒストグラムの表示
 #  plt.plot(img_hist_cv)
 
-  plt.hist(img.ravel(),256,[0,256])
+  plt.hist(img.ravel(),255,[0,256])
 
   buf = io.BytesIO()
   plt.savefig(buf, format='png')
@@ -53,6 +53,6 @@ def process_image(msg):
 
 rospy.init_node('mono8_to_histgram')
 rospy.loginfo('img_proc node started')
-pub = rospy.Publisher('hist_gram', Image, queue_size=10)
+pub = rospy.Publisher('histgram', Image, queue_size=10)
 rospy.Subscriber("image_raw", Image, process_image)
 rospy.spin()
