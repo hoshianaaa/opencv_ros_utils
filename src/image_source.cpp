@@ -21,7 +21,7 @@ class ImageConverter
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  ros::Subscriber capture_sub_;
+  ros::Subscriber capture_sub_, fname_sub_;
   image_transport::Publisher image_pub_;
 public:
   ImageConverter()
@@ -30,6 +30,7 @@ public:
     // Subscrive to input video feed and publish output video feed
     image_pub_ = it_.advertise("/image_source/output_image", 1);
     capture_sub_ = nh_.subscribe("/image_source/capture", 1000, &ImageConverter::captureCb, this);
+    fname_sub_ = nh_.subscribe("/image_source/file_name", 1000, &ImageConverter::fnameCb, this);
 
     camera.open("/dev/video0");
     if (!camera.isOpened()) {
@@ -41,15 +42,24 @@ public:
   ~ImageConverter()
   {
   }
-  void captureCb(const std_msgs::EmptyConstPtr& msg)
+  void imagePub(cv::Mat image)
   {
-    cv::Mat image;
-    camera >> image;
     cv_bridge::CvImagePtr cv_ptr;
 
     cv_ptr = cv_bridge::CvImagePtr(new cv_bridge::CvImage(std_msgs::Header(), "bgr8", image));
 
     image_pub_.publish(cv_ptr->toImageMsg());
+  }
+  void captureCb(const std_msgs::EmptyConstPtr& msg)
+  {
+    cv::Mat image;
+    camera >> image;
+    imagePub(image);
+  }
+  void fnameCb(const std_msgs::StringConstPtr& msg)
+  {
+    cv::Mat image = cv::imread("msg->data", -1);
+    imagePub(image);
   }
 };
 
