@@ -5,32 +5,58 @@
 #include <opencv2/highgui.hpp>
 #include "std_msgs/String.h"
 #include "std_msgs/Empty.h"
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+namespace enc = sensor_msgs::image_encodings;
+using namespace cv;
+using namespace std;
 
 cv::VideoCapture camera;
 
-void callback(const std_msgs::Empty::ConstPtr& msg)
+class ImageConverter
 {
-}
+  ros::NodeHandle nh_;
+  image_transport::ImageTransport it_;
+  image_transport::Subscriber image_sub_;
+  ros::Subscriber capture_sub_;
+  image_transport::Publisher image_pub_;
+public:
+  ImageConverter()
+    : it_(nh_)
+  {
+    // Subscrive to input video feed and publish output video feed
+    image_pub_ = it_.advertise("/image_source/output_image", 1);
+    capture_sub_ = nh_.subscribe("/image_source/capture", 1000, &ImageConverter::captureCb, this);
 
-int main(int argc, char** argv) {
-  ros::init (argc, argv, "image_source");
-  ros::NodeHandle nh("~"); 
-  image_transport::ImageTransport it(nh);
-  image_transport::Publisher image_pub = it.advertise("image", 10);
-  ros::Subscriber sub = nh.subscribe("capture", 1000, callback);
-  cv::Mat image;
-  camera.open("/dev/video0");
-  if (!camera.isOpened()) {
-    ROS_INFO("failed to open camera.");
-    return -1;
+    camera.open("/dev/video0");
+    if (!camera.isOpened()) {
+      ROS_INFO("failed to open camera.");
+      return;
+    }
+
   }
-  ros::Rate looprate (10);
-  while(ros::ok()) {
+  ~ImageConverter()
+  {
+  }
+  void captureCb(const std_msgs::EmptyConstPtr& msg)
+  {
+    cv::Mat image;
     camera >> image;
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
-    image_pub.publish(msg);
-    ros::spinOnce();
-    looprate.sleep();
+    cv_bridge::CvImagePtr cv_ptr;
+
+    cv_ptr = cv_bridge::CvImagePtr(new cv_bridge::CvImage(std_msgs::Header(), "bgr8", image));
+
+    image_pub_.publish(cv_ptr->toImageMsg());
   }
+};
+
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "image_converter");
+  ImageConverter ic;
+  ros::spin();
   return 0;
 }
