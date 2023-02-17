@@ -32,10 +32,23 @@ public:
     capture_sub_ = nh_.subscribe("/image_source/capture", 1000, &ImageConverter::captureCb, this);
     fname_sub_ = nh_.subscribe("/image_source/file_name", 1000, &ImageConverter::fnameCb, this);
 
+    ros::Rate loop_rate(100);
+
     camera.open("/dev/video0");
     if (!camera.isOpened()) {
-      ROS_INFO("failed to open camera.");
+          ROS_INFO("failed to open camera.");
       return;
+    }
+    
+    while (ros::ok())
+    {
+
+      cv::Mat image;
+      camera >> image;
+
+      loop_rate.sleep();
+      ros::spinOnce();
+
     }
 
   }
@@ -58,7 +71,7 @@ public:
   }
   void fnameCb(const std_msgs::StringConstPtr& msg)
   {
-    cv::Mat image = cv::imread("msg->data", -1);
+    cv::Mat image = cv::imread(msg->data, -1);
     imagePub(image);
   }
 };
