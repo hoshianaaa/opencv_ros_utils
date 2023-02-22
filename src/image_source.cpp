@@ -28,7 +28,7 @@ public:
     : it_(nh_)
   {
     // Subscrive to input video feed and publish output video feed
-    image_pub_ = it_.advertise("/image_source/output_image", 1);
+    image_pub_ = it_.advertise("/usb_cam/image_raw", 1);
     capture_sub_ = nh_.subscribe("/image_source/capture", 1000, &ImageConverter::captureCb, this);
     fname_sub_ = nh_.subscribe("/image_source/file_name", 1000, &ImageConverter::fnameCb, this);
 
