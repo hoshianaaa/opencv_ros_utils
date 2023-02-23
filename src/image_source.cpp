@@ -65,8 +65,15 @@ public:
 
     image_pub_.publish(cv_ptr->toImageMsg());
   }
+
   void capture_io_Cb(const std_msgs::BoolConstPtr& msg)
   {
+    if (msg->data == false)
+    {
+      cv::Mat image;
+      camera >> image;
+      imagePub(image);
+    }
   }
   void captureCb(const std_msgs::EmptyConstPtr& msg)
   {
