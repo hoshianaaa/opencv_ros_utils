@@ -68,8 +68,11 @@ public:
         pub_count++;
         if (pub_count > 2)
         {
-          io_set_pub_.publish(String("12,0"));
-          io_set_pub_.publish(String("13,0"));
+          std_msgs::String msg;
+          msg.data = "12,0";
+          io_set_pub_.publish(msg);
+          msg.data = "13,0";
+          io_set_pub_.publish(msg);
           pub_ = false;
           pub_count = 0;
         }
