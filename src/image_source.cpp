@@ -23,6 +23,7 @@ class ImageConverter
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
   ros::Subscriber capture_sub_, capture_io_sub_, fname_sub_;
+  ros::Publisher io_set_pub_;
   image_transport::Publisher image_pub_;
   image_transport::Publisher last_image_pub_;
   bool pub_;
@@ -39,6 +40,7 @@ public:
     capture_sub_ = nh_.subscribe("/image_source/capture", 1000, &ImageConverter::captureCb, this);
     capture_io_sub_ = nh_.subscribe("/hoshina_io/change_7", 1000, &ImageConverter::capture_io_Cb, this);
     fname_sub_ = nh_.subscribe("/image_source/file_name", 1000, &ImageConverter::fnameCb, this);
+    io_set_pub_ = nh_.advertise<std_msgs::String>("hoshina_io/set", 1000);
 
     ros::Rate loop_rate(100);
 
@@ -66,6 +68,8 @@ public:
         pub_count++;
         if (pub_count > 2)
         {
+          io_set_pub_.publish(String("12,0"));
+          io_set_pub_.publish(String("13,0"));
           pub_ = false;
           pub_count = 0;
         }
