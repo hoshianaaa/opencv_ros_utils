@@ -45,7 +45,6 @@ public:
     ros::Rate loop_rate(100);
 
     pub_ = false;
-    int pub_count = 0;
 
     camera.open("/dev/video0");
     if (!camera.isOpened()) {
@@ -65,17 +64,12 @@ public:
       {
         pub_image = image;
         imagePub(pub_image);
-        pub_count++;
-        if (pub_count > 2)
-        {
-          std_msgs::String msg;
-          msg.data = "12,0";
-          io_set_pub_.publish(msg);
-          msg.data = "13,0";
-          io_set_pub_.publish(msg);
-          pub_ = false;
-          pub_count = 0;
-        }
+        std_msgs::String msg;
+        msg.data = "12,0";
+        io_set_pub_.publish(msg);
+        msg.data = "13,0";
+        io_set_pub_.publish(msg);
+        pub_ = false;
       }
 
       lastImagePub(pub_image);
