@@ -5,6 +5,7 @@
 #include <opencv2/highgui.hpp>
 #include "std_msgs/String.h"
 #include "std_msgs/Empty.h"
+#include "std_msgs/Bool.h"
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -21,7 +22,7 @@ class ImageConverter
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
-  ros::Subscriber capture_sub_, fname_sub_;
+  ros::Subscriber capture_sub_, capture_io_sub_, fname_sub_;
   image_transport::Publisher image_pub_;
 public:
   ImageConverter()
@@ -30,6 +31,7 @@ public:
     // Subscrive to input video feed and publish output video feed
     image_pub_ = it_.advertise("/usb_cam/image_raw", 1);
     capture_sub_ = nh_.subscribe("/image_source/capture", 1000, &ImageConverter::captureCb, this);
+    capture_io_sub_ = nh_.subscribe("/hoshina_io/change_7", 1000, &ImageConverter::capture_io_Cb, this);
     fname_sub_ = nh_.subscribe("/image_source/file_name", 1000, &ImageConverter::fnameCb, this);
 
     ros::Rate loop_rate(100);
@@ -62,6 +64,9 @@ public:
     cv_ptr = cv_bridge::CvImagePtr(new cv_bridge::CvImage(std_msgs::Header(), "bgr8", image));
 
     image_pub_.publish(cv_ptr->toImageMsg());
+  }
+  void capture_io_Cb(const std_msgs::BoolConstPtr& msg)
+  {
   }
   void captureCb(const std_msgs::EmptyConstPtr& msg)
   {
