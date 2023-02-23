@@ -24,29 +24,54 @@ class ImageConverter
   image_transport::Subscriber image_sub_;
   ros::Subscriber capture_sub_, capture_io_sub_, fname_sub_;
   image_transport::Publisher image_pub_;
+  image_transport::Publisher last_image_pub_;
+  bool pub_;
 public:
   ImageConverter()
     : it_(nh_)
   {
+
     // Subscrive to input video feed and publish output video feed
     image_pub_ = it_.advertise("/usb_cam/image_raw", 1);
+
+    last_image_pub_ = it_.advertise("/usb_cam/last_image_raw", 1);
+
     capture_sub_ = nh_.subscribe("/image_source/capture", 1000, &ImageConverter::captureCb, this);
     capture_io_sub_ = nh_.subscribe("/hoshina_io/change_7", 1000, &ImageConverter::capture_io_Cb, this);
     fname_sub_ = nh_.subscribe("/image_source/file_name", 1000, &ImageConverter::fnameCb, this);
 
     ros::Rate loop_rate(100);
 
+    pub_ = false;
+    int pub_count = 0;
+
     camera.open("/dev/video0");
     if (!camera.isOpened()) {
-          ROS_INFO("failed to open camera.");
+      ROS_INFO("failed to open camera.");
       return;
     }
+
+    cv::Mat pub_image;
     
     while (ros::ok())
     {
 
       cv::Mat image;
       camera >> image;
+
+      if (pub_==true)
+      {
+        pub_image = image;
+        imagePub(pub_image);
+        pub_count++;
+        if (pub_count > 2)
+        {
+          pub_ = false;
+          pub_count = 0;
+        }
+      }
+
+      lastImagePub(pub_image);
 
       loop_rate.sleep();
       ros::spinOnce();
@@ -57,6 +82,16 @@ public:
   ~ImageConverter()
   {
   }
+
+  void lastImagePub(cv::Mat image)
+  {
+    cv_bridge::CvImagePtr cv_ptr;
+
+    cv_ptr = cv_bridge::CvImagePtr(new cv_bridge::CvImage(std_msgs::Header(), "bgr8", image));
+
+    last_image_pub_.publish(cv_ptr->toImageMsg());
+  }
+
   void imagePub(cv::Mat image)
   {
     cv_bridge::CvImagePtr cv_ptr;
@@ -70,16 +105,12 @@ public:
   {
     if (msg->data == false)
     {
-      cv::Mat image;
-      camera >> image;
-      imagePub(image);
+      pub_ = true;
     }
   }
   void captureCb(const std_msgs::EmptyConstPtr& msg)
   {
-    cv::Mat image;
-    camera >> image;
-    imagePub(image);
+    pub_ = true;
   }
   void fnameCb(const std_msgs::StringConstPtr& msg)
   {
