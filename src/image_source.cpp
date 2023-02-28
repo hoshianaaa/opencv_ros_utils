@@ -43,11 +43,13 @@ public:
     fname_sub_ = nh_.subscribe("/image_source/file_name", 1000, &ImageConverter::fnameCb, this);
     io_set_pub_ = nh_.advertise<std_msgs::String>("hoshina_io/set", 1000);
 
+    PSP_num capture_loop_psp = PSP_num(&nh_, "image_source/capture_loop");
+
     ros::Rate loop_rate(100);
 
     pub_ = false;
 
-    camera.open("/dev/video2");
+    camera.open("/dev/video0");
     if (!camera.isOpened()) {
       ROS_INFO("failed to open camera.");
       return;
@@ -61,7 +63,7 @@ public:
       cv::Mat image;
       camera >> image;
 
-      if (pub_==true)
+      if (pub_==true || capture_loop_psp.get_value()!=0)
       {
         pub_image = image;
         imagePub(pub_image);
