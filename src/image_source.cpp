@@ -49,7 +49,7 @@ public:
 
     pub_ = false;
 
-    camera.open("/dev/video0");
+    camera.open("/dev/video2");
     if (!camera.isOpened()) {
       ROS_INFO("failed to open camera.");
       return;
