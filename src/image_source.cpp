@@ -10,6 +10,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "./cpp_ros_utils/psp.h"
 
 namespace enc = sensor_msgs::image_encodings;
 using namespace cv;
@@ -46,7 +47,7 @@ public:
 
     pub_ = false;
 
-    camera.open("/dev/video0");
+    camera.open("/dev/video2");
     if (!camera.isOpened()) {
       ROS_INFO("failed to open camera.");
       return;
