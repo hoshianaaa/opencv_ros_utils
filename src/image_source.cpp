@@ -45,23 +45,39 @@ public:
 
     PSP_num capture_loop_psp = PSP_num(&nh_, "image_source/capture_loop");
 
+    std::vector<std::string> source_list = {"video_device","image"};
+    PSP_mode source_select_psp = PSP_mode(&nh_, "image_source/source_select", source_list);
+
     ros::Rate loop_rate(100);
 
     pub_ = false;
 
-    camera.open("/dev/video2");
-    if (!camera.isOpened()) {
-      ROS_INFO("failed to open camera.");
-      return;
-    }
-
     cv::Mat pub_image;
+    cv::Mat image;
+
+    std::string source_state;
     
     while (ros::ok())
     {
 
-      cv::Mat image;
-      camera >> image;
+      source_state = source_select_psp.get_value();
+
+      if (source_state == source_list[0])
+      {
+        if (!camera.isOpened())
+        {
+          //camera.open("/dev/video2");
+          camera.open("/dev/video0");
+        } 
+        else 
+        {
+          camera >> image;
+        }
+      }
+      else if (source_state == source_list[1])
+      {
+
+      }
 
       if (pub_==true || capture_loop_psp.get_value()!=0)
       {
