@@ -76,10 +76,13 @@ public:
       }
       else if (source_state == source_list[1])
       {
-
+        std::string file_name = "/home/dev/2d_vision_detector_ws/src/2d_vision_detector/opencv_ros_utils/image_samples/tea_packes.png";
+        image = cv::imread(file_name, -1);
       }
 
-      if (pub_==true || capture_loop_psp.get_value()!=0)
+      auto caploop = capture_loop_psp.get_value();
+
+      if (pub_==true || caploop==1)
       {
         pub_image = image;
         imagePub(pub_image);
